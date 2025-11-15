@@ -2,20 +2,33 @@
 
 namespace MatricesDemo
 {
-  class TwoDMatrix
+  // Додано абстрактний базовий клас з одним спільним Random
+  public abstract class Matrix
   {
-    protected int[,] A;
-    protected const int N = 3;
+    protected static readonly Random _rnd = new Random();
+    public abstract void InputFromConsole();
+    public abstract void FillRandom(int minValue = -50, int maxValue = 50);
+    public abstract int MinElement();
+    public abstract void Print();
+  }
+
+  public class TwoDMatrix : Matrix
+  {
+    private int[,] _a;
+    private readonly int Rows = 3;
+    private readonly int Cols = 3;
+
     public TwoDMatrix()
     {
-      A = new int[N, N];
+      _a = new int[Rows, Cols];
     }
-    public virtual void InputFromConsole()
+
+    public override void InputFromConsole()
     {
       Console.WriteLine("Введіть елементи двовимірної матриці 3x3 (цілі числа):");
-      for (int i = 0; i < N; i++)
+      for (int i = 0; i < _a.GetLength(0); i++)
       {
-        for (int j = 0; j < N; j++)
+        for (int j = 0; j < _a.GetLength(1); j++)
         {
           while (true)
           {
@@ -23,7 +36,7 @@ namespace MatricesDemo
             string? s = Console.ReadLine();
             if (int.TryParse(s, out int val))
             {
-              A[i, j] = val;
+              _a[i, j] = val;
               break;
             }
             Console.WriteLine("Невірне значення. Спробуйте знову.");
@@ -31,49 +44,59 @@ namespace MatricesDemo
         }
       }
     }
-    public virtual void FillRandom(int minValue = -50, int maxValue = 50)
+
+    public override void FillRandom(int minValue = -50, int maxValue = 50)
     {
-      var rnd = new Random();
-      for (int i = 0; i < N; i++)
-        for (int j = 0; j < N; j++)
-          A[i, j] = rnd.Next(minValue, maxValue + 1);
+      for (int i = 0; i < _a.GetLength(0); i++)
+        for (int j = 0; j < _a.GetLength(1); j++)
+          _a[i, j] = _rnd.Next(minValue, maxValue + 1);
     }
-    public virtual int MinElement()
+
+    public override int MinElement()
     {
-      int min = A[0, 0];
-      for (int i = 0; i < N; i++)
-        for (int j = 0; j < N; j++)
-          if (A[i, j] < min) min = A[i, j];
+      if (_a == null || _a.GetLength(0) == 0 || _a.GetLength(1) == 0)
+        throw new InvalidOperationException("Масив порожній або неініціалізований.");
+
+      int min = _a[0, 0];
+      for (int i = 0; i < _a.GetLength(0); i++)
+        for (int j = 0; j < _a.GetLength(1); j++)
+          if (_a[i, j] < min) min = _a[i, j];
       return min;
     }
-    public virtual void Print()
+
+    public override void Print()
     {
       Console.WriteLine("Двовимірна матриця 3x3:");
-      for (int i = 0; i < N; i++)
+      for (int i = 0; i < _a.GetLength(0); i++)
       {
-        for (int j = 0; j < N; j++)
-          Console.Write($"{A[i, j],6}");
+        for (int j = 0; j < _a.GetLength(1); j++)
+          Console.Write($"{_a[i, j],6}");
         Console.WriteLine();
       }
     }
   }
-  class ThreeDMatrix : TwoDMatrix
+
+  public class ThreeDMatrix : Matrix
   {
-    private int[,,] B;
-    private const int X = 3, Y = 3, Z = 3;
+    private int[,,] _b;
+    private readonly int X = 3;
+    private readonly int Y = 3;
+    private readonly int Z = 3;
+
     public ThreeDMatrix()
     {
-      B = new int[X, Y, Z];
+      _b = new int[X, Y, Z];
     }
+
     public override void InputFromConsole()
     {
       Console.WriteLine("Введіть елементи тривимірної матриці 3x3x3 (цілі числа):");
-      for (int k = 0; k < Z; k++)
+      for (int k = 0; k < _b.GetLength(2); k++)
       {
         Console.WriteLine($"Слой {k}:");
-        for (int i = 0; i < X; i++)
+        for (int i = 0; i < _b.GetLength(0); i++)
         {
-          for (int j = 0; j < Y; j++)
+          for (int j = 0; j < _b.GetLength(1); j++)
           {
             while (true)
             {
@@ -81,7 +104,7 @@ namespace MatricesDemo
               string? s = Console.ReadLine();
               if (int.TryParse(s, out int val))
               {
-                B[i, j, k] = val;
+                _b[i, j, k] = val;
                 break;
               }
               Console.WriteLine("Невірне значення. Спробуйте знову.");
@@ -90,38 +113,44 @@ namespace MatricesDemo
         }
       }
     }
+
     public override void FillRandom(int minValue = -50, int maxValue = 50)
     {
-      var rnd = new Random();
-      for (int k = 0; k < Z; k++)
-        for (int i = 0; i < X; i++)
-          for (int j = 0; j < Y; j++)
-            B[i, j, k] = rnd.Next(minValue, maxValue + 1);
+      for (int k = 0; k < _b.GetLength(2); k++)
+        for (int i = 0; i < _b.GetLength(0); i++)
+          for (int j = 0; j < _b.GetLength(1); j++)
+            _b[i, j, k] = _rnd.Next(minValue, maxValue + 1);
     }
+
     public override int MinElement()
     {
-      int min = B[0, 0, 0];
-      for (int k = 0; k < Z; k++)
-        for (int i = 0; i < X; i++)
-          for (int j = 0; j < Y; j++)
-            if (B[i, j, k] < min) min = B[i, j, k];
+      if (_b == null || _b.GetLength(0) == 0 || _b.GetLength(1) == 0 || _b.GetLength(2) == 0)
+        throw new InvalidOperationException("Масив порожній або неініціалізований.");
+
+      int min = _b[0, 0, 0];
+      for (int k = 0; k < _b.GetLength(2); k++)
+        for (int i = 0; i < _b.GetLength(0); i++)
+          for (int j = 0; j < _b.GetLength(1); j++)
+            if (_b[i, j, k] < min) min = _b[i, j, k];
       return min;
     }
+
     public override void Print()
     {
       Console.WriteLine("Тривимірна матриця 3x3x3 (по слоях):");
-      for (int k = 0; k < Z; k++)
+      for (int k = 0; k < _b.GetLength(2); k++)
       {
         Console.WriteLine($"Слой {k}:");
-        for (int i = 0; i < X; i++)
+        for (int i = 0; i < _b.GetLength(0); i++)
         {
-          for (int j = 0; j < Y; j++)
-            Console.Write($"{B[i, j, k],6}");
+          for (int j = 0; j < _b.GetLength(1); j++)
+            Console.Write($"{_b[i, j, k],6}");
           Console.WriteLine();
         }
       }
     }
   }
+
   class Program
   {
     static void Main(string[] args)
@@ -132,17 +161,20 @@ namespace MatricesDemo
       m2.Print();
       Console.WriteLine($"Мінімальний елемент двовимірної матриці: {m2.MinElement()}");
       Console.WriteLine();
-      TwoDMatrix m3 = new ThreeDMatrix(); // використаємо поліморфізм
+
+      Matrix m3 = new ThreeDMatrix(); // використаємо поліморфізм через базовий тип
       m3.FillRandom(); // викличеться перевизначений метод
       m3.Print(); // перевизначений Print
       Console.WriteLine($"Мінімальний елемент тривимірної матриці: {m3.MinElement()}");
       Console.WriteLine();
+
       Console.WriteLine("Приклад вводу з клавіатури для двовимірної матриці:");
       var user2 = new TwoDMatrix();
       user2.InputFromConsole();
       user2.Print();
       Console.WriteLine($"Мінімум (користувацька матриця 2D): {user2.MinElement()}");
       Console.WriteLine();
+
       Console.WriteLine("Приклад вводу з клавіатури для тривимірної матриці:");
       var user3 = new ThreeDMatrix();
       user3.InputFromConsole();
